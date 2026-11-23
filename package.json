@@ -1,0 +1,24 @@
+{
+  "name": "screencheck",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Check your screen resolution, scaling and refresh rate — and whether it is set correctly.",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "og": "node scripts/generate-og.mjs"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.6",
+    "@tailwindcss/vite": "^4.3.5",
+    "astro": "^7.4.13",
+    "tailwindcss": "^4.3.5"
+  },
+  "devDependencies": {
+    "sharp": "^0.35.5"
+  }
+}

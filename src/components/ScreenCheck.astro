@@ -1,0 +1,264 @@
+---
+const standards = [
+  { name: '720p', label: 'HD', w: 1280, h: 720, note: 'Older laptops and small TVs' },
+  { name: '1080p', label: 'Full HD', w: 1920, h: 1080, note: 'Most laptops and monitors' },
+  { name: '1200p', label: 'WUXGA', w: 1920, h: 1200, note: '16:10 office monitors' },
+  { name: '1440p', label: 'QHD', w: 2560, h: 1440, note: '27-inch monitors' },
+  { name: '1600p', label: 'WQXGA', w: 2560, h: 1600, note: '16:10 laptops' },
+  { name: 'Ultrawide', label: 'UWQHD', w: 3440, h: 1440, note: '34-inch ultrawide monitors' },
+  { name: '4K', label: 'UHD', w: 3840, h: 2160, note: 'Large monitors and 4K TVs' },
+  { name: '5K', label: '5K', w: 5120, h: 2880, note: '27-inch 5K displays' },
+];
+---
+
+<section id="tool" class="scroll-mt-24 animate-fade-up">
+  <div class="relative mx-auto max-w-3xl rounded-xl border border-hairline bg-canvas-elevated p-6 shadow-level-4 sm:p-8 dark:border-hairline dark:bg-canvas-elevated dark:shadow-level-4">
+    <div class="flex items-center gap-1 text-caption-mono text-primary">
+      <span class="relative flex h-1.5 w-1.5">
+        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-50"></span>
+        <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary"></span>
+      </span>
+      <span>Live</span>
+    </div>
+
+    <div class="mt-2 flex flex-wrap items-end gap-4">
+      <h2 id="res-main" class="text-mono-lg font-semibold tracking-tight text-ink dark:text-ink" style="font-size: clamp(2.5rem, 8vw, 5rem); line-height: 1.05;">— × —</h2>
+      <span id="res-class" class="mb-2 inline-flex items-center rounded-pill-sm bg-primary px-3 py-1 text-sm font-medium text-on-primary">Detecting…</span>
+    </div>
+    <p class="mt-1 text-sm text-body dark:text-body">Physical pixels reported by your browser</p>
+
+    <p id="verdict" class="mt-4 max-w-2xl text-lg font-medium leading-relaxed text-ink dark:text-ink" aria-live="polite">Reading your display…</p>
+    <p id="verdict-sub" class="mt-2 max-w-2xl text-base leading-relaxed text-body dark:text-body"></p>
+
+    <div class="mt-4 flex flex-wrap items-center gap-2">
+      <button id="copy-btn" type="button" class="btn-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+        Copy display info
+      </button>
+      <button id="recheck-btn" type="button" class="btn-secondary">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
+        Re-check
+      </button>
+      <span id="copy-status" role="status" aria-live="polite" class="text-sm font-medium text-success dark:text-success"></span>
+    </div>
+  </div>
+
+  <dl class="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5" aria-label="Display details">
+    <div class="card-default"><dt class="text-caption-mono text-muted dark:text-muted">CSS pixels</dt><dd id="stat-css" class="mt-1 text-mono-md font-semibold text-ink dark:text-ink">—</dd></div>
+    <div class="card-default"><dt class="text-caption-mono text-muted dark:text-muted">Scaling</dt><dd id="stat-scaling" class="mt-1 text-mono-md font-semibold text-ink dark:text-ink">—</dd></div>
+    <div class="card-default"><dt class="text-caption-mono text-muted dark:text-muted">Pixel ratio</dt><dd id="stat-dpr" class="mt-1 text-mono-md font-semibold text-ink dark:text-ink">—</dd></div>
+    <div class="card-default"><dt class="text-caption-mono text-muted dark:text-muted">Viewport</dt><dd id="stat-viewport" class="mt-1 text-mono-md font-semibold text-ink dark:text-ink">—</dd></div>
+    <div class="card-default"><dt class="text-caption-mono text-muted dark:text-muted">Available</dt><dd id="stat-avail" class="mt-1 text-mono-md font-semibold text-ink dark:text-ink">—</dd></div>
+    <div class="card-default"><dt class="text-caption-mono text-muted dark:text-muted">Color depth</dt><dd id="stat-depth" class="mt-1 text-mono-md font-semibold text-ink dark:text-ink">—</dd></div>
+    <div class="card-default"><dt class="text-caption-mono text-muted dark:text-muted">Aspect ratio</dt><dd id="stat-ratio" class="mt-1 text-mono-md font-semibold text-ink dark:text-ink">—</dd></div>
+    <div class="card-default"><dt class="text-caption-mono text-muted dark:text-muted">Orientation</dt><dd id="stat-orientation" class="mt-1 text-sm font-semibold text-ink dark:text-ink">—</dd></div>
+    <div class="card-default"><dt class="text-caption-mono text-muted dark:text-muted">Refresh rate</dt><dd id="stat-refresh" class="mt-1 text-mono-md font-semibold text-ink dark:text-ink">Measuring…</dd></div>
+    <div class="card-default"><dt class="text-caption-mono text-muted dark:text-muted">Device</dt><dd id="stat-device" class="mt-1 text-sm font-semibold text-ink dark:text-ink">—</dd></div>
+  </dl>
+
+  <noscript><p class="mt-4 rounded-lg border border-warning bg-warning/10 p-4 text-sm text-warning">ScreenCheck needs JavaScript. Please enable it and reload.</p></noscript>
+</section>
+
+<section class="mt-24 scroll-mt-24 band-dark rounded-xl animate-fade-up" style="padding: 64px 24px;">
+  <div class="container-page">
+    <h2 class="text-display-sm font-semibold tracking-tight">Is my resolution right?</h2>
+    <p class="mt-2 max-w-2xl text-base leading-relaxed opacity-80">Most screens look sharpest at their native resolution. Here is where yours sits against the common sizes.</p>
+    <div class="mt-4 space-y-2">
+      {standards.map((s) => (
+        <div data-standard data-name={s.name} data-w={s.w} data-h={s.h} class="standard-row flex flex-col gap-1 rounded-lg px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-semibold">{s.name}</span>
+            <span class="badge-secondary">{s.label}</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <span class="text-mono-md opacity-70">{s.w} × {s.h}</span>
+            <span data-you-are-here class="hidden rounded-full bg-primary px-2 py-0.5 text-caption-mono text-on-primary">You are here</span>
+          </div>
+          <span class="text-xs opacity-60">{s.note}</span>
+        </div>
+      ))}
+    </div>
+    <p class="mt-4 text-xs leading-relaxed opacity-50">A browser can only report the size the page is given. On some Macs and phones this is the scaled size, not the panel's spec sheet.</p>
+  </div>
+</section>
+
+<section class="mt-24 scroll-mt-24 band-soft rounded-xl animate-fade-up" style="padding: 64px 24px;">
+  <div class="container-page">
+    <h2 class="text-display-sm font-semibold tracking-tight text-ink dark:text-ink">Why is my number lower than my monitor's?</h2>
+    <p class="mt-2 text-base leading-relaxed text-body dark:text-body">
+      Your screen has <strong id="why-physical" class="text-mono-md text-ink dark:text-ink">—</strong> physical pixels. But your browser draws in <strong id="why-css" class="text-mono-md text-ink dark:text-ink">—</strong> CSS pixels at <strong id="why-scale" class="text-mono-md text-ink dark:text-ink">—</strong> scaling. That is normal: scaling makes text bigger without changing the screen.
+    </p>
+    <p class="mt-2 text-base leading-relaxed text-body dark:text-body">
+      To see the panel's real resolution, open display settings and choose <strong class="text-ink dark:text-ink">Recommended</strong> (Windows) or <strong class="text-ink dark:text-ink">Default</strong> (Mac). For bigger text, raise scaling — not resolution.
+    </p>
+  </div>
+</section>
+
+<section class="mt-24 scroll-mt-24 animate-fade-up">
+  <div class="container-page">
+    <h2 class="text-display-sm font-semibold tracking-tight text-ink dark:text-ink">Quick sharpness check</h2>
+    <p class="mt-2 max-w-2xl text-base leading-relaxed text-body dark:text-body">The lines below should look crisp and even. If your browser is scaling, the pattern will blur or shimmer.</p>
+    <div class="sharpness-pattern mt-4" aria-hidden="true"></div>
+    <p class="mt-2 text-xs leading-relaxed text-muted dark:text-muted">
+      See wavy lines? Press <kbd class="rounded-xs border border-hairline bg-canvas-elevated px-2 py-0.5 text-xs">Ctrl</kbd> + <kbd class="rounded-xs border border-hairline bg-canvas-elevated px-2 py-0.5 text-xs">0</kbd> (Windows) or <kbd class="rounded-xs border border-hairline bg-canvas-elevated px-2 py-0.5 text-xs">Cmd</kbd> + <kbd class="rounded-xs border border-hairline bg-canvas-elevated px-2 py-0.5 text-xs">0</kbd> (Mac) to reset zoom.
+    </p>
+  </div>
+</section>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const setText = (id, text) => { const el = $(id); if (el) el.textContent = text; };
+  const standardRows = Array.from(document.querySelectorAll('[data-standard]'));
+  const standards = standardRows.map((row) => ({ name: row.getAttribute('data-name') || '', w: Number(row.getAttribute('data-w')), h: Number(row.getAttribute('data-h')) }));
+
+  const deviceInfo = (() => {
+    const ua = navigator.userAgent;
+    let os = 'your device';
+    if (/Windows/i.test(ua)) os = 'Windows';
+    else if (/iPhone|iPad|iPod/i.test(ua)) os = 'iOS';
+    else if (/Android/i.test(ua)) os = 'Android';
+    else if (/Mac OS X|Macintosh/i.test(ua)) os = 'macOS';
+    else if (/CrOS/i.test(ua)) os = 'ChromeOS';
+    else if (/Linux/i.test(ua)) os = 'Linux';
+    let browser = 'your browser';
+    if (/Edg\//.test(ua)) browser = 'Edge';
+    else if (/OPR\/|Opera/i.test(ua)) browser = 'Opera';
+    else if (/Firefox\//.test(ua)) browser = 'Firefox';
+    else if (/Chrome\//.test(ua)) browser = 'Chrome';
+    else if (/Safari\//.test(ua)) browser = 'Safari';
+    const touch = navigator.maxTouchPoints > 0;
+    const shortSide = Math.min(window.screen.width || 0, window.screen.height || 0);
+    let device = 'Desktop / laptop';
+    if (touch && shortSide <= 500) device = 'Phone';
+    else if (touch && shortSide <= 900) device = 'Tablet';
+    else if (touch && shortSide <= 1200) device = 'Touch laptop';
+    return { os, browser, device };
+  })();
+
+  function aspectRatio(w, h) {
+    const gcd = (a, b) => (b ? gcd(b, a % b) : a);
+    const g = gcd(w, h) || 1;
+    const rw = Math.round(w / g), rh = Math.round(h / g);
+    if (rw > 40 || rh > 40) return `${(w / h).toFixed(2)} : 1`;
+    return `${rw} : ${rh}`;
+  }
+
+  function findStandard(w, h) {
+    const long = Math.max(w, h), short = Math.min(w, h);
+    for (const s of standards) {
+      const sLong = Math.max(s.w, s.h), sShort = Math.min(s.w, s.h);
+      if (Math.abs(long - sLong) <= Math.max(4, sLong * 0.02) && Math.abs(short - sShort) <= Math.max(4, sShort * 0.02)) return s;
+    }
+    return null;
+  }
+
+  let refreshRate = null, current = null, refreshAttempts = 0;
+
+  function update() {
+    const dpr = window.devicePixelRatio || 1;
+    const cssW = Math.round(window.screen.width || window.innerWidth || 0);
+    const cssH = Math.round(window.screen.height || window.innerHeight || 0);
+    const physW = Math.round(cssW * dpr), physH = Math.round(cssH * dpr);
+    const availW = Math.round(window.screen.availWidth || cssW), availH = Math.round(window.screen.availHeight || cssH);
+    const vpW = Math.round(window.innerWidth), vpH = Math.round(window.innerHeight);
+    const depth = window.screen.colorDepth || 24;
+    const scalePct = Math.round(dpr * 100);
+    const portrait = window.matchMedia('(orientation: portrait)').matches;
+    const std = findStandard(physW, physH);
+    const isMobile = deviceInfo.device === 'Phone' || deviceInfo.device === 'Tablet';
+    const ratio = aspectRatio(physW, physH);
+
+    setText('res-main', `${physW} × ${physH}`);
+    setText('res-class', isMobile ? deviceInfo.device : std ? std.name : 'Custom');
+    setText('stat-css', `${cssW} × ${cssH}`);
+    setText('stat-scaling', `${scalePct}%`);
+    setText('stat-dpr', `${dpr}×`);
+    setText('stat-viewport', `${vpW} × ${vpH}`);
+    setText('stat-avail', `${availW} × ${availH}`);
+    setText('stat-depth', `${depth}-bit`);
+    setText('stat-ratio', ratio);
+    setText('stat-orientation', portrait ? 'Portrait' : 'Landscape');
+    setText('stat-device', deviceInfo.device);
+    if (refreshRate) setText('stat-refresh', `~${refreshRate} Hz`);
+
+    if (isMobile) {
+      setText('verdict', `You're on a ${deviceInfo.device.toLowerCase()}. This is your screen's resolution.`);
+      setText('verdict-sub', `Phone and tablet screens don't use names like 1080p, so it's normal if the number looks unusual.`);
+    } else if (std) {
+      setText('verdict', `Your screen is ${physW} × ${physH} — ${std.name}. This is likely its native resolution.`);
+      setText('verdict-sub', dpr === 1 ? `Scaling is 100%, so your browser and screen use the same pixels.` : `Scaling is ${scalePct}%, so your browser sees ${cssW} × ${cssH} CSS pixels. Multiply by ${dpr}× to get ${physW} × ${physH}.`);
+    } else {
+      setText('verdict', `Your screen is ${physW} × ${physH}. That doesn't match a common resolution name.`);
+      setText('verdict-sub', `You may be using a scaled or custom setting. Open display settings and pick "Recommended".`);
+    }
+
+    setText('why-physical', `${physW} × ${physH}`);
+    setText('why-css', `${cssW} × ${cssH}`);
+    setText('why-scale', `${scalePct}%`);
+
+    standardRows.forEach((row) => {
+      const w = Number(row.getAttribute('data-w')), h = Number(row.getAttribute('data-h'));
+      const badge = row.querySelector('[data-you-are-here]');
+      const isMatch = !!std && w === std.w && h === std.h;
+      row.classList.toggle('is-here', isMatch);
+      if (badge) badge.classList.toggle('hidden', !isMatch);
+    });
+
+    current = { physW, physH, cssW, cssH, scalePct, dpr, vpW, vpH, availW, availH, depth, ratio, portrait, std };
+  }
+
+  function buildReport() {
+    if (!current) return '';
+    const c = current;
+    const name = c.std ? ` (${c.std.name})` : '';
+    return ['ScreenCheck — display report', `Screen resolution: ${c.physW} × ${c.physH}${name}`, `CSS pixels: ${c.cssW} × ${c.cssH}`, `Scaling: ${c.scalePct}%`, `Device pixel ratio: ${c.dpr}×`, `Viewport: ${c.vpW} × ${c.vpH}`, `Available area: ${c.availW} × ${c.availH}`, `Aspect ratio: ${c.ratio}`, `Color depth: ${c.depth}-bit`, `Orientation: ${c.portrait ? 'Portrait' : 'Landscape'}`, `Refresh rate: ${refreshRate ? `~${refreshRate} Hz` : 'unknown'}`, `Device: ${deviceInfo.device}`, `Browser: ${deviceInfo.browser} on ${deviceInfo.os}`].join('\n');
+  }
+
+  async function copyText(text) {
+    try { await navigator.clipboard.writeText(text); return true; }
+    catch { try { const a = document.createElement('textarea'); a.value = text; a.style.position = 'fixed'; a.style.opacity = '0'; document.body.appendChild(a); a.select(); const ok = document.execCommand('copy'); document.body.removeChild(a); return ok; } catch { return false; } }
+  }
+
+  $('copy-btn')?.addEventListener('click', async () => {
+    const ok = await copyText(buildReport());
+    const s = $('copy-status');
+    if (s) { s.textContent = ok ? 'Copied ✓' : 'Copy failed'; window.setTimeout(() => { s.textContent = ''; }, 2500); }
+  });
+
+  function measureRefresh() {
+    if (document.visibilityState === 'hidden') { setText('stat-refresh', 'Open tab to measure'); return; }
+    setText('stat-refresh', 'Measuring…');
+    const deltas = []; let last = null; const start = performance.now();
+    function tick(now) {
+      if (last !== null) deltas.push(now - last);
+      last = now;
+      if (now - start < 1000) { requestAnimationFrame(tick); return; }
+      if (deltas.length < 10) { refreshAttempts++; if (refreshAttempts < 3) window.setTimeout(measureRefresh, 1200); else setText('stat-refresh', 'Click Re-check'); return; }
+      deltas.sort((a, b) => a - b);
+      const median = deltas[Math.floor(deltas.length / 2)];
+      const raw = median > 0 ? 1000 / median : 0;
+      if (raw < 30) { refreshAttempts++; if (refreshAttempts < 3) window.setTimeout(measureRefresh, 1200); else setText('stat-refresh', 'Click Re-check'); return; }
+      refreshAttempts = 0;
+      const common = [60, 75, 90, 120, 144, 165, 180, 240, 360];
+      let best = Math.round(raw);
+      for (const rate of common) { if (Math.abs(raw - rate) <= 4) { best = rate; break; } }
+      refreshRate = best;
+      setText('stat-refresh', `~${best} Hz`);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  $('recheck-btn')?.addEventListener('click', () => { update(); measureRefresh(); });
+  let rafId = 0;
+  function onResize() { window.cancelAnimationFrame(rafId); rafId = window.requestAnimationFrame(update); }
+  window.addEventListener('resize', onResize);
+  window.addEventListener('orientationchange', onResize);
+  window.screen.orientation?.addEventListener?.('change', onResize);
+  let dprQuery = null;
+  function onDprChange() { watchDpr(); update(); }
+  function watchDpr() { if (dprQuery) dprQuery.removeEventListener('change', onDprChange); dprQuery = window.matchMedia(`(resolution: ${window.devicePixelRatio || 1}dppx)`); dprQuery.addEventListener('change', onDprChange); }
+  watchDpr();
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && !refreshRate) measureRefresh(); });
+  update();
+  measureRefresh();
+</script>

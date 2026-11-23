@@ -1,0 +1,66 @@
+---
+import ThemeToggle from './ThemeToggle.astro';
+
+const nav = [
+  { href: '/#tool', label: 'Check my screen' },
+  { href: '/#how', label: 'How it works' },
+  { href: '/#faq', label: 'FAQ' },
+  { href: '/about', label: 'About' },
+];
+---
+
+<header class="sticky top-0 z-50 border-b border-hairline bg-canvas/95 backdrop-blur dark:border-hairline dark:bg-canvas">
+  <div class="container-page flex h-16 items-center justify-between gap-4">
+    <a href="/" class="flex items-center gap-2 font-semibold tracking-tight text-ink dark:text-ink" aria-label="ScreenCheck home">
+      <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-on-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5" aria-hidden="true">
+          <rect x="2" y="3" width="20" height="14" rx="2"></rect>
+          <path d="M8 21h8"></path>
+          <path d="M12 17v4"></path>
+        </svg>
+      </span>
+      <span class="text-lg">Screen<span class="text-link">Check</span></span>
+    </a>
+
+    <nav class="hidden items-center gap-1 md:flex" aria-label="Main navigation">
+      {nav.map((item) => (
+        <a href={item.href} class="btn-ghost text-sm">{item.label}</a>
+      ))}
+    </nav>
+
+    <div class="flex items-center gap-2">
+      <ThemeToggle />
+      <button id="menu-button" type="button" class="btn-icon md:hidden" aria-label="Open menu" aria-controls="mobile-menu" aria-expanded="false">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="h-5 w-5" aria-hidden="true">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div id="mobile-menu" class="hidden border-t border-hairline bg-canvas px-6 pb-6 pt-3 md:hidden dark:border-hairline dark:bg-canvas">
+    <nav class="flex flex-col gap-2" aria-label="Mobile navigation">
+      {nav.map((item) => (
+        <a href={item.href} class="btn-ghost justify-start text-base">{item.label}</a>
+      ))}
+    </nav>
+  </div>
+</header>
+
+<script>
+  const menuButton = document.getElementById('menu-button');
+  const mobileMenu = document.getElementById('mobile-menu');
+  menuButton?.addEventListener('click', () => {
+    if (!mobileMenu) return;
+    const isOpen = mobileMenu.classList.toggle('hidden') === false;
+    menuButton.setAttribute('aria-expanded', String(isOpen));
+    menuButton.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
+  });
+  mobileMenu?.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', () => {
+      mobileMenu.classList.add('hidden');
+      menuButton?.setAttribute('aria-expanded', 'false');
+      menuButton?.setAttribute('aria-label', 'Open menu');
+    });
+  });
+</script>

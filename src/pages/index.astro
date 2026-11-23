@@ -1,0 +1,75 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ScreenCheck from '../components/ScreenCheck.astro';
+
+const siteUrl = new URL('/', Astro.site).toString();
+const webApplication = { '@context': 'https://schema.org', '@type': 'WebApplication', name: 'ScreenCheck', url: siteUrl, applicationCategory: 'UtilitiesApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript.', description: 'Free screen resolution checker.', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, featureList: ['Detect screen resolution', 'Show scaling and DPR', 'Estimate refresh rate', 'Compare against common resolutions', 'Copy display report', '100% client-side'] };
+const faqs = [
+  { q: 'What is my screen resolution?', a: 'Open this page and read the large number at the top. It shows the physical resolution your browser reports, plus the common name (like 1080p or 1440p).' },
+  { q: 'Why does it show a different number than my monitor specs?', a: 'Your OS uses scaling to make text bigger. The browser draws in fewer CSS pixels, then the screen scales up. Multiply CSS pixels by device pixel ratio to get physical resolution.' },
+  { q: 'What is device pixel ratio?', a: 'DPR is how many physical pixels fit into one CSS pixel. A normal monitor at 100% scaling has DPR 1. Retina screens usually have DPR 2 or more.' },
+  { q: 'How do I find my native resolution?', a: 'Windows: right-click desktop → Display settings → pick "Recommended". Mac: System Settings → Displays → pick "Default".' },
+  { q: 'Does this work on phones?', a: 'Yes. Open the page on the device. Phone resolutions don\'t have names like 1080p, so the label may say "Custom" or show the device type.' },
+  { q: 'Is my information uploaded?', a: 'No. Everything runs on your device. Nothing is sent to a server. No accounts, no tracking cookies.' },
+  { q: 'Why does refresh rate say "approximately"?', a: 'Browsers don\'t expose refresh rate directly. ScreenCheck measures frames over a short window. Background tabs and power saving can affect it.' },
+];
+const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((item) => ({ '@type': 'Question', name: item.q, acceptedAnswer: { '@type': 'Answer', text: item.a } })) };
+const howItWorks = [
+  { title: 'Open the page', body: 'Your browser reports display details automatically. Nothing to install, nothing to click first.' },
+  { title: 'Read the answer', body: 'The top card shows your resolution in plain language, plus scaling, pixel ratio and refresh rate.' },
+  { title: 'Copy if needed', body: 'One click copies a clean display report for a support ticket, forum post or message.' },
+];
+---
+
+<BaseLayout title="ScreenCheck — What Is My Screen Resolution?" description="Free screen resolution checker. See your exact resolution, scaling, device pixel ratio and refresh rate — and whether your display is set up correctly." structuredData={[webApplication, faqSchema]}>
+  <section class="band-light" style="padding: 128px 24px;">
+    <div class="container-page">
+      <div class="mx-auto max-w-3xl text-center animate-fade-up">
+        <span class="inline-flex items-center gap-1 rounded-pill-sm border border-hairline bg-canvas-elevated px-3 py-1 text-caption-mono text-body dark:border-hairline dark:bg-canvas-elevated dark:text-body">
+          <span class="h-1.5 w-1.5 rounded-full bg-success"></span>
+          Free · No signup · Runs in your browser
+        </span>
+        <h1 class="mt-4 text-display-xl font-semibold tracking-tight text-ink dark:text-ink text-balance">What is my screen resolution?</h1>
+        <p class="mt-4 mx-auto max-w-2xl text-lg leading-relaxed text-body dark:text-body text-balance">See your exact resolution, scaling and refresh rate in one second — and whether your display is set up correctly.</p>
+      </div>
+      <div class="mt-16"><ScreenCheck /></div>
+    </div>
+  </section>
+
+  <section id="how" class="band-soft scroll-mt-24" style="padding: 96px 24px;">
+    <div class="container-page">
+      <div class="mx-auto max-w-2xl text-center animate-fade-up">
+        <h2 class="text-display-lg font-semibold tracking-tight text-ink dark:text-ink">How it works</h2>
+        <p class="mt-2 text-base leading-relaxed text-body dark:text-body">Three steps, no settings to configure.</p>
+      </div>
+      <div class="mt-16 grid gap-6 sm:grid-cols-3">
+        {howItWorks.map((step, index) => (
+          <div class="card-feature animate-fade-up" style={`animation-delay: ${index * 100}ms;`}>
+            <div class="flex h-10 w-10 items-center justify-center rounded-sm bg-primary text-on-primary text-lg font-bold">{index + 1}</div>
+            <h3 class="mt-4 text-display-sm font-semibold tracking-tight text-ink dark:text-ink">{step.title}</h3>
+            <p class="mt-2 text-base leading-relaxed text-body dark:text-body">{step.body}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section id="faq" class="band-light scroll-mt-24" style="padding: 96px 24px;">
+    <div class="container-page">
+      <div class="mx-auto max-w-3xl animate-fade-up">
+        <h2 class="text-display-lg font-semibold tracking-tight text-ink dark:text-ink text-center">Frequently asked questions</h2>
+        <div class="mt-12 divide-y divide-hairline dark:divide-hairline">
+          {faqs.map((item) => (
+            <details class="py-4 group">
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-semibold text-ink marker:hidden dark:text-ink">
+                {item.q}
+                <span class="text-body text-muted transition group-open:rotate-45 dark:text-muted">+</span>
+              </summary>
+              <p class="mt-3 text-base leading-relaxed text-body dark:text-body">{item.a}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

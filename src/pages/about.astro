@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="About ScreenCheck" description="ScreenCheck is a free, single-purpose screen resolution checker.">
+  <section class="band-light" style="padding: 128px 24px;">
+    <div class="container-page">
+      <div class="mx-auto max-w-3xl animate-fade-up">
+        <h1 class="text-display-xl font-semibold tracking-tight text-ink dark:text-ink">About ScreenCheck</h1>
+        <div class="legal-prose mt-8">
+          <p>ScreenCheck is a free tool that tells you your screen resolution in plain language. It also shows the details behind that number — scaling, device pixel ratio, aspect ratio and an estimated refresh rate.</p>
+          <h2>Why it exists</h2>
+          <p>Most resolution checkers show a table of technical values and leave you to work out what they mean. Others are buried inside large sites with dozens of unrelated tools. ScreenCheck does one job: it tells you what your screen is, and whether it is set up the way it should be.</p>
+          <h2>How it works</h2>
+          <p>Your browser already knows the size of the screen it is drawing on. When you open this page, ScreenCheck reads those values, converts them to a physical resolution, and compares the result with common screen sizes. All of that happens on your device.</p>
+          <h2>Privacy</h2>
+          <p>Nothing is uploaded. There are no accounts, no tracking cookies and no server-side processing. The copy button puts a plain-text report on your clipboard, and that is the only place the information goes unless you paste it somewhere yourself.</p>
+          <h2>Accuracy</h2>
+          <p>Browsers can only report the display size they are given. On some Macs and phones that is the scaled size rather than the panel's spec sheet, so treat the result as a strong hint rather than a guarantee. The refresh rate is measured by counting frames, so it is an estimate.</p>
+        </div>
+        <a href="/#tool" class="mt-8 btn-primary inline-flex">Check my screen</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
